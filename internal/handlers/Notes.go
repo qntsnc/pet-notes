@@ -1,0 +1,32 @@
+package handlers
+
+import (
+	"encoding/json"
+	"net/http"
+	"notes/internal/repository/db"
+)
+
+type NoteHandler struct {
+	Repo *db.Queries
+}
+
+func (h *NoteHandler) PostNote(w http.ResponseWriter, r *http.Request) {
+	var params db.CreateNoteParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	noteID, err := h.Repo.CreateNote(r.Context(), params)
+	if err != nil {
+		http.Error(w, "Failed to create note", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "Note created successfully",
+		"note_id": noteID,
+	})
+}
