@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  server:
+    build: .
+    container_name: notes_server
+    depends_on:
+      - postgres
+    ports:
+      - "3333:3333"
+    restart: always
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: server
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: notes_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - "notes:/var/lib/postgresql/notes"
+      - ./internal/repository/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+volumes:
+  notes:

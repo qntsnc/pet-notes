@@ -52,3 +52,21 @@ func (h *NoteHandler) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(note)
 }
+
+func (h *NoteHandler) UpdateNote(w http.ResponseWriter, r *http.Request) {
+	var params db.UpdateNoteParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Repo.UpdateNote(r.Context(), params); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "Note updated successfully",
+	})
+}

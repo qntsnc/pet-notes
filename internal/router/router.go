@@ -16,5 +16,6 @@ func NewRouter(repo *db.Queries) *chi.Mux {
 	r.Get("/", handlers.HomeHandler)
 	r.Post("/notes", noteHandler.PostNote)
 	r.Get("/notes/{id}", noteHandler.GetNoteByID)
+	r.Put("/notes", noteHandler.UpdateNote)
 	return r
 }
